@@ -1,0 +1,17 @@
+# Botning asosiy kutubxonalari
+python-telegram-bot
+aiogram
+requests
+
+# Web server va Render uchun
+flask
+gunicorn
+
+# Ma'lumotlar bazasi va yordamchi
+asgiref
+Django==6.0.3
+sqlparse
+python-dateutil
+PyYAML
+cryptography
+typing_extensions
