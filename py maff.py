@@ -5,7 +5,8 @@ from telegram.ext import (
     ApplicationBuilder, CommandHandler, MessageHandler,
     CallbackQueryHandler, ConversationHandler, filters, ContextTypes
 )
-
+from uptimer.py import start_uptimer
+import asyncio
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
     level=logging.INFO
@@ -330,3 +331,16 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+
+async def main():
+    # Uptimer serverni ishga tushirish
+    start_uptimer()
+
+    # Bu yerda botingizni ishga tushirish kodi (masalan, Aiogram)
+    print("Bot ishga tushmoqda...")
+    # await dp.start_polling(bot)
+
+
+if __name__ == "__main__":
+    asyncio.run(main())
