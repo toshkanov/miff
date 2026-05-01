@@ -5,7 +5,7 @@ from telegram.ext import (
     ApplicationBuilder, CommandHandler, MessageHandler,
     CallbackQueryHandler, ConversationHandler, filters, ContextTypes
 )
-from uptimer.py import start_uptimer
+from uptimer import start_uptimer
 import asyncio
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -297,7 +297,11 @@ async def cancel(update: Update, context: ContextTypes.DEFAULT_TYPE):
     return ConversationHandler.END
 
 # ===================== MAIN =====================
-def main():
+async def main_bot():
+    # 1. Uptimer serverni ishga tushiramiz (Render o'chib qolmasligi uchun)
+    start_uptimer()
+
+    # 2. Telegram Botni sozlaymiz
     app = ApplicationBuilder().token(BOT_TOKEN).build()
 
     conv = ConversationHandler(
@@ -326,21 +330,19 @@ def main():
     app.add_handler(CallbackQueryHandler(operator_detail, pattern="^op_\\d+$"))
     app.add_handler(CallbackQueryHandler(back_manager, pattern="^back_manager$"))
 
-    print("✅ Bot ishga tushdi...")
-    app.run_polling()
+    # 3. Botni ishga tushiramiz
+    print("✅ Bot va Uptimer ishga tushdi...")
 
-if __name__ == "__main__":
-    main()
-
-
-async def main():
-    # Uptimer serverni ishga tushirish
-    start_uptimer()
-
-    # Bu yerda botingizni ishga tushirish kodi (masalan, Aiogram)
-    print("Bot ishga tushmoqda...")
-    # await dp.start_polling(bot)
+    # run_polling() o'zi ichkarida asyncio event loopni boshqaradi
+    async with app:
+        await app.initialize()
+        await app.start_polling()
+        # Bot to'xtamaguncha kutib turadi
+        await asyncio.Event().wait()
 
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    try:
+        asyncio.run(main_bot())
+    except (KeyboardInterrupt, SystemExit):
+        print("Bot to'xtatildi.")
