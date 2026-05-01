@@ -297,13 +297,14 @@ async def cancel(update: Update, context: ContextTypes.DEFAULT_TYPE):
     return ConversationHandler.END
 
 # ===================== MAIN =====================
-async def main_bot():
-    # 1. Uptimer serverni ishga tushiramiz (Render o'chib qolmasligi uchun)
+def main():
+    # 1. Render o'chib qolmasligi uchun Uptimer'ni yoqamiz
     start_uptimer()
 
-    # 2. Telegram Botni sozlaymiz
+    # 2. Botni quramiz
     app = ApplicationBuilder().token(BOT_TOKEN).build()
 
+    # ConversationHandler va boshqa handlerlarni qo'shish
     conv = ConversationHandler(
         entry_points=[
             CommandHandler("start", start),
@@ -321,8 +322,6 @@ async def main_bot():
             CONTRACT_PRODUCT: [MessageHandler(filters.TEXT & ~filters.COMMAND, contract_product)],
         },
         fallbacks=[CommandHandler("cancel", cancel)],
-        per_user=True,
-        allow_reentry=True,
     )
 
     app.add_handler(conv)
@@ -330,19 +329,9 @@ async def main_bot():
     app.add_handler(CallbackQueryHandler(operator_detail, pattern="^op_\\d+$"))
     app.add_handler(CallbackQueryHandler(back_manager, pattern="^back_manager$"))
 
-    # 3. Botni ishga tushiramiz
-    print("✅ Bot va Uptimer ishga tushdi...")
-
-    # run_polling() o'zi ichkarida asyncio event loopni boshqaradi
-    async with app:
-        await app.initialize()
-        await app.start_polling()
-        # Bot to'xtamaguncha kutib turadi
-        await asyncio.Event().wait()
-
+    # 3. Botni oddiy run_polling orqali yoqamiz (Render'da bu eng barqaror usul)
+    print("🚀 Bot va Uptimer muvaffaqiyatli ishga tushdi...")
+    app.run_polling()
 
 if __name__ == "__main__":
-    try:
-        asyncio.run(main_bot())
-    except (KeyboardInterrupt, SystemExit):
-        print("Bot to'xtatildi.")
+    main()
